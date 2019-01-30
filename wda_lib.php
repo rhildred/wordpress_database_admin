@@ -6,14 +6,8 @@
  */
 
 function wda_showTable(){
-	global $wdaDbObj;
-	$qry="SHOW TABLES";
-	
-	$result = $wdaDbObj->ExecuteQuery($qry);
-	if($result){
-		return $result;	
-	}
-	return 0;
+    global $wpdb, $table_prefix;
+    return $wpdb->tables();
 }
 
 /*
@@ -24,14 +18,24 @@ function wda_showTable(){
  */
  
 function wda_showTableStructure($TableName){
-	global $wdaDbObj;
-	$qry="SHOW COLUMNS FROM  ".$TableName.";";
-	$result = $wdaDbObj->ExecuteQuery($qry);
-	if($result){
-		return $result;	
-	}
-	return 0;
-	
+    global $wpdb, $table_prefix;
+
+    $rc = array();
+    $stmt = $wpdb->prepare("SELECT * FROM " . esc_sql($TableName) . " LIMIT 1", array());
+    if($wpdb->last_error !== ''){
+        $wpdb->print_error();
+    }
+    $resultSet = $wpdb->get_results($stmt);
+    if(count($resultSet) > 0){
+        $oRow = $resultSet[0];
+        $aKeys = array_keys((array)$oRow);        
+        foreach($aKeys as $sKey){
+            $oRow = new stdClass();
+            $oRow->name = $sKey;
+            array_push($rc, $oRow);
+        }
+    }
+	return($rc);
 }
  
 /**
@@ -77,10 +81,9 @@ function wda_ajax_getTableColums(){
 	$table = $_POST['table'];
 	$rsTableColumn = wda_showTableStructure($table);
 	if($rsTableColumn){
-		while($row=mysql_fetch_assoc($rsTableColumn)){
-			$content = $row['Field'];
-			$content .= $row['Extra']=='auto_increment'?'<label class="ex-label auto-increment pull-right" title="Auto Increment"></label>':'';
-			echo '<div class="col-4" data-table="'.$table.'"><label class="lbl-table-col" title="'.$table.'.'.$row['Field'].'" data-table="'.$table.'" data-column="'.$row['Field'].'" data-type="'.$row['Type'].'" data-null="'.$row['Null'].'" data-key="'.$row['Key'].'" data-extra="'.$row['Extra'].'" draggable="true">'
+        foreach($rsTableColumn as $row){
+			$content = $row;
+			echo '<div class="col-4" data-table="'.$table.'"><label class="lbl-table-col" title="'.$table.'.'.$row.'" data-table="'.$table.'" data-column="'.$row.'" data-type="string" data-null="null" data-key="n/a" draggable="true">'
 				.$content.
 				'</label></div>';
 		}

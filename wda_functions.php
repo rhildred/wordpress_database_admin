@@ -25,7 +25,7 @@ $URL = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['SCRIPT_NAME'].'?page='.$pageNam
 
 // Database Acccess
 
-$wdaDbObj= new wdaDatabaseAccess(DB_HOST,DB_USER,DB_PASSWORD,DB_NAME); // Get Constant form wordpress config.php
+$wdaDbObj= new wdaDatabaseAccess(); // Get Constant form wordpress config.php
 //$URL = wda_TruncQueryString('action',$URL);
 //$URL = wda_TruncQueryString('tbl',$URL);
 

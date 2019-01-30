@@ -1,0 +1,16 @@
+version: '2'
+
+services:
+  dev:
+    build:
+      context: .
+    volumes:
+      - ./:/usr/src/wordpress/wp-content/plugins/wp_db_admin/
+      - ./wp-config.php:/usr/src/wordpress/wp-config.php
+      - ./database:/usr/src/wordpress/wp-content/database
+    restart: always
+    entrypoint: sh -c "cd /usr/src/wordpress && php -S 0.0.0.0:${RHPORT}"
+    ports:
+      - "${RHPORT}:${RHPORT}"
+    user: ${CURRENT_UID}
+    network_mode: "host"

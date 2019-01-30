@@ -1,137 +1,73 @@
 <?php
 	class wdaDatabaseAccess
-	{
-		private $_serverName;
-		private $_userName;
-		private $_databaseName;
-		private $_password;
-		
-		public function wdaDatabaseAccess($Sname,$Uname,$Pass,$DBname)
+	{		
+		public function ExecuteNoneQuery($ssQL, $aParams = array())
 		{
-			$this->_serverName=$Sname;
-			$this->_userName=$Uname;
-			$this->_password=$Pass;
-			$this->_databaseName=$DBname;
-		}
-		
-		public function ExecuteNoneQuery($query)
-		{
-			$con=mysql_connect($this->_serverName,$this->_userName,$this->_password)
-			or 
-			die(mysql_error()."<br>");
-			
-			mysql_select_db($this->_databaseName,$con)
-			or 
-			die(mysql_error()."<br>");
-			
-			mysql_query($query,$con)
-			or
-			//die(mysql_error()."<br>");
-			$error = mysql_error()."<br>";
-			if(isset($error)){ return $error; }
-			$affectedRow=mysql_affected_rows();
-			
-			mysql_close($con)
-			or
-			die(mysql_error()."<br>");
-			
+            global $wpdb, $table_prefix;
+            $stmt = $wpdb->prepare($ssQL, $aParams);
+            $affectedRow = $wpdb->query($stmt);			
 			return $affectedRow;
 		}
-		public function ExecuteQuery($query)
+		public function ExecuteQuery($ssQL, $aParams = array())
 		{
-			$con=mysql_connect($this->_serverName,$this->_userName,$this->_password)
-			or 
-			die(mysql_error()."<br>");
-
-			mysql_select_db($this->_databaseName,$con)
-			or 
-			die(mysql_error()."<br>");
-
-			$resultSet=mysql_query($query,$con)
-			or 
-			//die(mysql_error()."<br>");
-			$error = mysql_error()."<br>";
-			if(isset($error)){ return $error; }
-			
-			mysql_close($con)
-			or
-			die(mysql_error()."<br>");
-			
-			return $resultSet;
+            global $wpdb, $table_prefix;
+            $stmt = $wpdb->prepare($ssQL, $aParams);
+			return $wpdb->get_results($stmt);
 		}
 	
-		public function FillDropDown( $query ,$Selected=false)
+		public function FillDropDown( $ssQL , $aParams = array(), $Selected=false)
 		{
-		
-		
-			$con=mysql_connect($this->_serverName,$this->_userName,$this->_password)
-			or 
-			die(mysql_error()."<br>");
-			
-			mysql_select_db($this->_databaseName,$con)
-			or 
-			die(mysql_error()."<br>");
-			
-			$resultSet=mysql_query($query,$con)
-			or 
-			die(mysql_error()."<br>");
-			
+				
+            global $wpdb, $table_prefix;
+            $stmt = $wpdb->prepare($ssQL, $aParams);
+            $resultSet = $wpdb->get_results($stmt);
+			echo $resultSet;
 			
 			if($resultSet)
 			{
-				while($row=mysql_fetch_row($resultSet))
+                $aKeys = array_keys($resultSet);
+				foreach($resultSet as $row )
 				{
-					if($row[0]==$Selected && $Selected!=false)
+					if($row[$aKeys[0]]==$Selected && $Selected!=false)
 					{
-						echo '<option value='.$row[0].' selected>'.$row[1].'</option>';
+						echo '<option value='.$row[$aKeys[0]].' selected>'.$row[$aKeys[1]].'</option>';
 					}
 					else
 					{
-						echo '<option value='.$row[0].'>'.$row[1].'</option>';	
+						echo '<option value='.$row[$aKeys[0]].'>'.$row[$aKeys[1]].'</option>';	
 					}
 				}
 			}
-			
-			mysql_close($con)
-			or
-			die(mysql_error()."<br>");
 			return true;
 
 		}
 	
-		function DisplayTable($ResultSet)
+		function DisplayTable($resultSet)
 		{
-			if(gettype($ResultSet)=="resource")
-			{
-				$No=mysql_num_fields($ResultSet)
-				or
-				die(mysql_error()."<br>");
-				echo "<table border='1' cellspacing='0'  bordercolor='#222' class='table-list' >";
-				echo "<tr class='header'>";
-				for($i=0;$i<$No;$i++)
-				{
-					$FieldName=mysql_field_name($ResultSet,$i)
-					or
-					die(mysql_error()."<br>");
-					echo "<th><label>".$FieldName."</label></th>";
-				}
-				echo "</tr>";
-				while($row=mysql_fetch_row($ResultSet))
-				{
-					echo "<tr>";
-					for($i=0;$i<$No;$i++)
-					{
-						 echo "<td> <label>".$row[$i]."</label></td>";
-					}
-					echo "</tr>";
-				}
-				echo "</table>";
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+            if(count($resultSet) > 0){
+
+                $aKeys = array_keys((array)$resultSet[0]);
+                $No=count($aKeys);
+                echo "<table border='1' cellspacing='0'  bordercolor='#222' class='table-list' >";
+                echo "<tr class='header'>";
+                for($i=0;$i<$No;$i++)
+                {
+                    $FieldName=$aKeys[$i];
+                    echo "<th><label>".$FieldName."</label></th>";
+                }
+                echo "</tr>";
+                foreach($resultSet as $row )
+                {
+                    echo "<tr>";
+                    for($i=0;$i<$No;$i++)
+                    {
+                            echo "<td> <label>".$row->{$aKeys[$i]}."</label></td>";
+                    }
+                    echo "</tr>";
+                }
+                echo "</table>";
+            }
+            return true;
 	}
 	
 }

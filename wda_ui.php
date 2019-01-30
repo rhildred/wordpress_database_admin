@@ -93,7 +93,7 @@
 				<form name="wda_custome_query" method="post" action="<?php echo $URL;?>">
 					<?php	wp_nonce_field('wda_query_form','wda_query_form_nonce',true,true);	?>
 					<div class="row">
-						<div class="col-12"><h4>Custome Query</h4></div>
+						<div class="col-12"><h4>Custom Query</h4></div>
 					</div>
 					<div class="row">
 						<div class="col-12">
@@ -152,15 +152,15 @@
 							$tableList=wda_showTable();
 							//$wdaDbObj->DisplayTable($tableList);
 							if($tableList){
-								while($row=mysql_fetch_array($tableList)){
+								foreach($tableList as $row){
 									echo '<tr>';
-										echo '<td><label><input type="checkbox" name="controlTable" id="controlTable" data-table="'.$row[0].'" value="'.$row[0].'">'.$row[0].'</label></td>';
+										echo '<td><label><input type="checkbox" name="controlTable" id="controlTable" data-table="'.$row.'" value="'.$row.'">'.$row.'</label></td>';
 										echo '<td>
-												<a class="table-action" href="javascript:" tabindex="-1" data-action="browse" data-table="'.$row[0].'" title="Display Data"><span class="fa fa-file-text"></span></a>
-												<a class="table-action" href="javascript:" tabindex="-1" data-action="structure" data-table="'.$row[0].'" title="Display Structure"><span class="fa fa-file-text-o"></span></a>
+												<a class="table-action" href="javascript:" tabindex="-1" data-action="browse" data-table="'.$row.'" title="Display Data"><span class="fa fa-file-text"></span></a>
+												<a class="table-action" href="javascript:" tabindex="-1" data-action="structure" data-table="'.$row.'" title="Display Structure"><span class="fa fa-file-text-o"></span></a>
 												
-												<a class="" href="'.$URL.$QueryStringStart.'action=trunc&tbl='.$row[0].'" tabindex="-1" data-action="trunc" data-table="'.$row[0].'" title="Truncate Table"><span class="fa fa-trash-o"></span></a>
-												<a class="" href="'.$URL.$QueryStringStart.'action=drop&tbl='.$row[0].'" tabindex="-1" data-action="drop" data-table="'.$row[0].'" title="Drop Table"><span class="fa fa-trash"></span></a>
+												<a class="" href="'.$URL.$QueryStringStart.'action=trunc&tbl='.$row.'" tabindex="-1" data-action="trunc" data-table="'.$row.'" title="Truncate Table"><span class="fa fa-trash-o"></span></a>
+												<a class="" href="'.$URL.$QueryStringStart.'action=drop&tbl='.$row.'" tabindex="-1" data-action="drop" data-table="'.$row.'" title="Drop Table"><span class="fa fa-trash"></span></a>
 												
 											</td>';
 									echo '</tr>';	
